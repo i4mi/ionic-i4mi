@@ -540,8 +540,8 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 
 .service('I4MISettingsService', ['$localStorage','$crypto',function($localStorage,$crypto){
 	var encryptionKey;
-	if ( window.cordova && cordova.device ) {
-		encryptionKey = cordova.device.uuid || '1234';
+	if ( window.device && device.uuid ) {
+		encryptionKey = device.uuid;
 	} else {
 		encryptionKey = '1234';
 	}
