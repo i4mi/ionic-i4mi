@@ -563,6 +563,152 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	}
 }])
 
+.service('I4MIDefaultsService',['I4MISettingsService', 'I4MIMapping', 'I4MIUnits', 'I4MISystems', 'I4MIFormats', 'I4MISchemes', function(I4MISettingsService, I4MIMapping, I4MIUnits, I4MISystems, I4MIFormats, I4MISchemes){
+	var defaults = I4MISettingsService.get('i4mi.defaults');
+	defaults.I4MIMapping = defaults.I4MIMapping || I4MIMapping;
+	defaults.I4MIUnits = defaults.I4MIUnits || I4MIUnits;
+	defaults.I4MISystems = defaults.I4MISystems || I4MISystems;
+	defaults.I4MIFormats = defaults.I4MIFormats || I4MIFormats;
+	defaults.I4MISchemes = defaults.I4MISchemes || I4MISchemes;
+	
+	var get = function(path, obj) {
+		path = path.split(".");
+		var value = obj || defaults;
+		for ( var i in path ) {
+			console.log("get:path",path,value);
+			value = value[path[i]];
+			if ( typeof value === "string" ) {
+				if ( value.substr(0, 5) === "$ref:" ) {
+					value = get(value.substr(5));
+				} else {
+					var m = value.match(/\{\$ref:[^\{\}\|]+\}/gi);
+					for ( var i in m ) {
+						var v = get(m[i].substring(6, m[i].length-1));
+						console.log(v, m[i]);
+						value = value.replace(m[i], v);
+					}
+				}
+			}
+		}
+		return value;
+	}
+	var getString = function(path, obj) {
+		var value = get(path, obj);
+		if ( typeof value !== "string" ) {
+			value = JSON.stringify(value);
+		}
+		return value;
+	}
+	var set = function(path, val, obj) {
+		path = path.split(".");
+		obj = obj || defaults;
+		var set = [obj];
+		for ( index in path ) {
+			set.push( set[index][path[index]] || {} );
+		}
+		set[set.length - 1] = val;
+		for ( index in path ) {
+			set[path.length - 1 - index][path[path.length - 1 - index]] = set[path.length - index];
+		}
+	}
+	var resolve = function(obj) {
+		for ( var key in obj ) {
+			var value = obj[key];
+			if ( typeof value === "string" ) {
+				if ( value.substr(0, 5) === "$ref:" ) {
+					value = get(value.substr(5));
+				} else {
+					var m = value.match(/\{\$ref:[^\{\}\|]+\}/gi);
+					for ( var i in m ) {
+						var v = get(m[i].substring(6, m[i].length-1));
+						console.log(v, m[i]);
+						value = value.replace(m[i], v);
+					}
+				}
+			}
+			if ( typeof value === "object" ) {
+				value = resolve(value);
+			}
+			obj[key] = value;
+		}
+		return obj;
+	}
+	
+	return {
+		get: get,
+		getString: getString,
+		set: set,
+		resolve: resolve
+	}
+}])
+
+.service('I4MIMappingService',['I4MIDefaultsService',function(I4MIDefaultsService){
+	var mapping = I4MIDefaultsService.get('I4MIMapping');
+	var schemes = I4MIDefaultsService.get('I4MISchemes');
+	console.log("0",mapping,schemes);
+	
+	var map = function(src, dst, data) {
+		if ( !Array.isArray(data) ) {
+			data = [data];
+		}
+		console.log("1",src,dst,data);
+		var output = [];
+		for ( var i in data ) {
+			var d = data[i];
+			var matchFound = false;
+			var type;
+			for ( var j in schemes ) {
+				var s = schemes[j];
+				for ( var k in mapping ) {
+					var m = mapping[k];
+					console.log("2",m,I4MIDefaultsService.getString(m[src].typeKey, d),I4MIDefaultsService.getString(m[src].typeKey, s[src]));
+					if ( I4MIDefaultsService.getString(m[src].typeKey,d) === I4MIDefaultsService.getString(m[src].typeKey,s[src]) ) {
+						type = j;
+						matchFound = true;
+						break;
+					}
+				}
+				if ( matchFound ) {
+					break;
+				}
+			}
+			console.log("3",type);
+			var out = JSON.parse(JSON.stringify(schemes[type][dst]));
+			out = I4MIDefaultsService.resolve(out);
+			console.log("4",out);
+			mapping[type] = I4MIDefaultsService.resolve(mapping[type]);
+			for ( var key in mapping[type][src] ) {
+				if ( key === "typeKey" ) {
+					continue;
+				}
+				var p = mapping[type][src][key][0].split("|");
+				var value = I4MIDefaultsService.get(p[0],d);
+				var values = mapping[type][dst][key];
+				for ( var i in values ) {
+					var v = values[i].split("|");
+					var path = v[0];
+					console.log(path);
+					if ( key === "date" ) {
+						var format = v[1];
+						var date = new Date(value);
+						if ( format === "iso" ) {
+							date = date.toISOString();
+						}
+						value = date;
+					}
+					I4MIDefaultsService.set(path,value,out);
+				}
+			}
+			output.push(out);
+		}
+		return output;
+	}
+	
+	return {
+		map: map
+	}
+}])
+
 .service('I4MIMidataService', ['I4MIModalService','I4MISettingsService','$q','$http','$crypto','APPNAME','APPSECRET',function(I4MIModalService,I4MISettingsService,$q,$http,$crypto,APPNAME,APPSECRET){
 	var appname = APPNAME;
 	var appsecr = APPSECRET;

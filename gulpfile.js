@@ -37,7 +37,7 @@ gulp.task('json2js', function () {
 gulp.task('make-bundle', ['del', 'html2js', 'css2js', 'json2js'], function () {
   return gulp.src(['dist/*', './src/*.js'])
     .pipe(concat('i4mi.bundle.min.js'))
-    //.pipe(uglify())
+    .pipe(uglify())
     .pipe(gulp.dest('dist/'));
 });
 
