@@ -1,0 +1,83 @@
+{
+	"I4MIFormats": {
+		"date": {
+			"iso": "iso",
+			"object": "$"
+		}
+	},
+	"I4MISystems": {
+		"measure": "http://unitsofmeasure.org"
+	},
+	"I4MIUnits": {
+		"weight": {
+			"name": "kg",
+			"system": "{$ref:I4MISystems.measure}"
+		}
+	},
+	"I4MISchemes": {
+		"weight": {
+			"midata": {
+				"name": "Weight",
+				"format": "fhir/Observation",
+				"subformat": "Quantity",
+				"content": "http://loinc.org 3141-9",
+				"data": "$ref:I4MISchemes.weight.fhir"
+			},
+			"fhir": {
+				"resourceType": "Observation",
+				"status": "preliminary",
+				"effectiveDateTime": null,
+				"category": {
+					"coding": [
+						{
+							"system": "http://hl7.org/fhir/ValueSet/observation-category",
+			    			"code": "vital-signs",
+					    	"display": "Vital Signs"
+			       		}
+					]
+				},
+				"code": {
+					"coding": [
+						{
+							"system": "http://loinc.org",
+			    			"code": "3141-9",
+					    	"display": "Body weight Measured"
+			       		}
+					]
+				},
+				"valueQuantity": {
+					"unit": "{$ref:I4MIUnits.weight.name}",
+					"system": "{$ref:I4MIUnits.weight.system}",
+					"code": "{$ref:I4MIUnits.weight.name}",
+					"value": null
+				}
+			},
+			"healthkit": {
+				"startDate": null,
+				"endDate": null,
+				"sampleType": "HKQuantityTypeIdentifierBodyMass",
+				"unit": "{$ref:I4MIUnits.weight.name}",
+				"amount": null
+			}
+		}
+	},
+	"I4MIMapping": {
+		"weight": {
+			"midata": {
+				"value": ["data.{$ref:I4MIMapping.weight.fhir.value}"],
+				"date": ["data.{$ref:I4MIMapping.weight.fhir.date}|{$ref:I4MIFormats.date.iso}"],
+				"typeKey": "content"
+			},
+			"fhir": {
+				"value": ["valueQuantity.value"],
+				"date": ["effectiveDateTime"],
+				"typeKey": "code.coding"
+			},
+			"healthkit": {
+				"value": ["amount"],
+				"date": ["startDate|{$ref:I4MIFormats.date.object}","endDate|{$ref:I4MIFormats.date.object}"],
+				"typeKey": "sampleType"
+			}
+		}
+	}
+}
