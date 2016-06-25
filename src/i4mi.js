@@ -1,4 +1,4 @@
-angular.module('i4mi', ['i4mi.templates','ionic','ionic-datepicker','ionic-timepicker','ngStorage','mdo-angular-cryptography'])
+angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepicker','ionic-timepicker','ngStorage','mdo-angular-cryptography'])
 
 /******************************************************/
 /* controllers */
@@ -112,8 +112,8 @@ angular.module('i4mi', ['i4mi.templates','ionic','ionic-datepicker','ionic-timep
 	}
 	
 	var setValue = function(tmpEntry, entry) {
-		var path = tmpEntry.data.$set.split('.');
-		var set = [tmpEntry.data];
+		var path = tmpEntry.$set.split('.');
+		var set = [tmpEntry.$scheme];
 		for ( index in path ) {
 			set.push( set[index][path[index]] );
 		}
@@ -121,7 +121,7 @@ angular.module('i4mi', ['i4mi.templates','ionic','ionic-datepicker','ionic-timep
 		for ( index in path ) {
 			set[path.length - 1 - index][path[path.length - 1 - index]] = set[path.length - index];
 		}
-		delete tmpEntry.data.$set;
+		tmpEntry = tmpEntry.$scheme;
 	}
 	
 	$scope.add = function(entry) {
