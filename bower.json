@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Ionic I4MI is a collection of AngularJS services and directives for Ionic framework to enable fast prototyping of apps integrating the MIDATA.coop platform. The i4mi module is developed and maintained by the Institute for Medical Informatics (I4MI, http://www.ti.bfh.ch/de/bachelor/medizininformatik.html) at Berner Fachhochschule (BFH, http://www.bfh.ch) and is intended to support its students with their semester projects.",
   "main": [
-  	"./dist/i4mi.bundle.min.js"
+    "./dist/i4mi.bundle.min.js"
   ],
   "authors": [
     "i4mi@bfh"
@@ -19,7 +19,8 @@
     "ionic-timepicker": "^0.4.0",
     "angular-nvd3": "^1.0.5",
     "angular-formly-templates-ionic": "^1.2.2",
-    "angular-cryptography": "^1.0.1"
+    "angular-cryptography": "^1.0.1",
+    "angular-momentjs": "^0.2.2"
   },
   "ignore": [
     "**/.*",

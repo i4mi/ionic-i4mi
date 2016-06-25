@@ -5,6 +5,7 @@ var uglify = require('gulp-uglify');
 var ngHtml2Js = require("gulp-ng-html2js");
 var minifyHtml = require("gulp-minify-html");
 var css2js = require("gulp-css2js");
+var gulpNgConfig = require('gulp-ng-config');
 
 gulp.task('html2js', function () {
   return gulp.src(['./src/*.html'])
@@ -20,19 +21,28 @@ gulp.task('html2js', function () {
 gulp.task('css2js', function () {
   return gulp.src("./src/*.css")
     .pipe(css2js())
+    .pipe(concat("styles.js"))
     //.pipe(uglify())
     .pipe(gulp.dest("./dist/"));
 });
 
-gulp.task('make-bundle', ['del', 'html2js', 'css2js'], function () {
+gulp.task('json2js', function () {
+  return gulp.src("./src/*.json")
+    .pipe(gulpNgConfig('i4mi.defaults'))
+    .pipe(concat("defaults.js"))
+    //.pipe(uglify())
+    .pipe(gulp.dest('./dist/'));
+});
+
+gulp.task('make-bundle', ['del', 'html2js', 'css2js', 'json2js'], function () {
   return gulp.src(['dist/*', './src/*.js'])
     .pipe(concat('i4mi.bundle.min.js'))
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(gulp.dest('dist/'));
 });
 
 gulp.task('del-temp-files', ['make-bundle'], function () {
-  del(['dist/templates.js']);
+  del(['dist/templates.js','dist/styles.js','dist/defaults.js']);
 });
 
 gulp.task('del', function () {
@@ -40,3 +50,5 @@ gulp.task('del', function () {
 });
 
 gulp.task('build', ['del-temp-files']);
+
+gulp.task('default', ['build']);
