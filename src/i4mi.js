@@ -67,7 +67,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 			templateOptions: {
 				type: 'text',
 				label: 'MIDATA Server',
-				placeholder: 'https://xx.midata.coop'
+				placeholder: 'https://test.midata.coop:9000'
 			}
 		}
 	]
