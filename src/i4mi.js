@@ -356,7 +356,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 		scope: {
 			type: '@',
 			records: '=',
-			options: '=',
+			options: '=?',
 			interval: '@',
 			operation: '@'
 		},
