@@ -1,4 +1,4 @@
-angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepicker','ionic-timepicker','ngStorage','mdo-angular-cryptography'])
+angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepicker','ionic-timepicker','ngStorage','mdo-angular-cryptography','jsonFormatter'])
 
 /******************************************************/
 /* controllers */
@@ -448,6 +448,60 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	};
 }])
 
+.directive('i4miHealthkitImport', ['I4MIHealthKitService',function(I4MIHealthKitService){
+	return {
+		restrict: 'E',
+		scope: {
+			types: '=',
+			choice: '@',
+			options: '=',
+			import: '='
+		},
+		link: function(scope, element, attrs) {
+			scope.import = function() {
+				var tps = [];
+				for ( var t in types ) {
+					if ( types[t] ) {
+						tps.push(t);
+					}
+				}
+				I4MIHealthKitService.importRecords(tps, options);
+			}
+		},
+		templateUrl: 'i4mi.healthkit.import.html'
+	};
+}])
+
+.directive('i4miCcdaImport', ['I4MICcdaService',function(I4MICcdaService){
+	return {
+		restrict: 'E',
+		scope: {
+			url: '=',
+			display: '@',
+			callback: '=',
+			action: '=',
+			actionText: '@'
+		},
+		link: function(scope, element, attrs) {
+			scope.import = function(url) {
+				I4MICcdaService.importRecord(url).then(function(r){
+					scope.record = r;
+					if ( typeof scope.callback === 'function' ) {
+						scope.callback(r);
+					}
+				},function(){});
+			}
+			scope.continue = function(record) {
+				if ( typeof scope.action === 'function' ) {
+					scope.action(record);
+				}
+				scope.record = null;
+			}
+		},
+		templateUrl: 'i4mi.ccda.import.html'
+	};
+}])
+
 /******************************************************/
 /* services */
 /******************************************************/
@@ -559,6 +613,98 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 				return JSON.parse($crypto.decrypt($localStorage.settings[key], encryptionKey));
 			}
 			return {};
+		}
+	}
+}])
+
+.service('I4MICcdaService',['$q','$http',function($q,$http){
+	var self = this;
+	
+	var importRecord = function(url){
+		var deferred = $q.defer();
+		$http({
+			method: 'GET',
+			url: url
+		}).then(function successCallback(response){
+			var record = BlueButton(response.data);
+			deferred.resolve(record);
+		},function errorCallback(response){
+			deferred.reject('Could not connect!');
+		});
+		return deferred.promise;
+	}
+	
+	return {
+		importRecord: importRecord
+	}
+}])
+
+.service('I4MINativeService',['$q',function($q){
+	var self = this;
+	
+	var call = function(action, args){
+		var deferred = $q.defer();
+		cordova.exec(deferred.resolve, deferred.reject, "I4MI", action, args);
+		return deferred.promise;
+	};
+	
+	cordova.exec(function(result){
+		var fields = result.fields;
+		for (var j = 0; j < fields.length; j++ ) {
+			self[fields[j]] = function(){
+				return call(fields[j], arguments);
+			};
+		}
+	}, function(){}, "I4MI", "i4miNativeMethods", args);
+	
+	return {
+		exec: call
+	}
+}])
+
+.service('I4MIHealthKitService',['I4MIModalService','$q', '$ionicPlatform',function(I4MIModalService, $q, $ionicPlatform){
+	var self = this;
+	var available = false;
+	$ionicPlatform.ready(function(){
+		var hk = {
+			available: function(){
+				return $q(function(resolve, reject){
+					resolve(false);
+				});
+			}
+		}
+		if ( window.plugins && plugins.healthkit ) {
+			hk = plugins.healthkit;
+			available = true;
+		}
+		for ( var m in hk ) {
+			self[m] = function(options) {
+				var deferred = $q.defer();
+				hk[m].call(self, options, deferred.resolve, deferred.reject);
+				return deferred.promise;
+			}
+		}
+		
+		window.healthkit = self;
+	});
+	
+	return {
+		exportToMIDATA: function(map) {
+			
+		},
+		syncToMIDATA: function(types, map) {
+			this.monitorSampleType();
+		},
+		doWhenAvailable: function(func) {
+			if ( available ) {
+				func();
+			}
+		},
+		import: function(types, options) {
+			options.startDate = options.startDate || new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
+			options.endDate = options.endDate || new Date();
+			
+			//self.querySampleType({'sampleType': 'HKQuantityTypeIdentifierStepCount'
 		}
 	}
 }])
