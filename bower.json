@@ -10,7 +10,6 @@
   ],
   "dependencies": {
     "ionic": ">=1.2.4",
-    "ionic-material": "^0.4.2",
     "robotodraft": "^1.1.0",
     "ngstorage": "^0.3.10",
     "angular-formly": "^8.1.0",
