@@ -121,14 +121,14 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 		for ( index in path ) {
 			set[path.length - 1 - index][path[path.length - 1 - index]] = set[path.length - index];
 		}
-		tmpEntry = tmpEntry.$scheme;
+		return tmpEntry.$scheme;
 	}
 	
 	$scope.add = function(entry) {
 		var midataEntry = [];
 		if ( $scope.groupEntry === 'true' || $scope.groupEntry === true ) {
 			var tmpEntry = JSON.parse(JSON.stringify($scope.fhir));
-			setValue(tmpEntry, entry);
+			tmpEntry = setValue(tmpEntry, entry);
 			tmpEntry.data.effectiveDateTime = $scope.datetime;
 			midataEntry.push(tmpEntry);
 		} else {
@@ -136,7 +136,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 				if ( !entry.hasOwnProperty(field) ) continue;
 				if ( !entry[field] || entry[field] === '' ) continue;
 				var tmpEntry = JSON.parse(JSON.stringify($scope.fhir[field]));
-				setValue(tmpEntry, entry[field]);
+				tmpEntry = setValue(tmpEntry, entry[field]);
 				tmpEntry.data.effectiveDateTime = $scope.datetime;
 				midataEntry.push(tmpEntry);
 			}
@@ -570,12 +570,11 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	defaults.I4MISystems = defaults.I4MISystems || I4MISystems;
 	defaults.I4MIFormats = defaults.I4MIFormats || I4MIFormats;
 	defaults.I4MISchemes = defaults.I4MISchemes || I4MISchemes;
-	
+
 	var get = function(path, obj) {
 		path = path.split(".");
 		var value = obj || defaults;
 		for ( var i in path ) {
-			console.log("get:path",path,value);
 			value = value[path[i]];
 			if ( typeof value === "string" ) {
 				if ( value.substr(0, 5) === "$ref:" ) {
@@ -584,13 +583,12 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 					var m = value.match(/\{\$ref:[^\{\}\|]+\}/gi);
 					for ( var i in m ) {
 						var v = get(m[i].substring(6, m[i].length-1));
-						console.log(v, m[i]);
 						value = value.replace(m[i], v);
 					}
 				}
 			}
 		}
-		return value;
+		return resolve(value);
 	}
 	var getString = function(path, obj) {
 		var value = get(path, obj);
@@ -621,7 +619,6 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 					var m = value.match(/\{\$ref:[^\{\}\|]+\}/gi);
 					for ( var i in m ) {
 						var v = get(m[i].substring(6, m[i].length-1));
-						console.log(v, m[i]);
 						value = value.replace(m[i], v);
 					}
 				}
@@ -633,7 +630,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 		}
 		return obj;
 	}
-	
+
 	return {
 		get: get,
 		getString: getString,
@@ -645,13 +642,11 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 .service('I4MIMappingService',['I4MIDefaultsService',function(I4MIDefaultsService){
 	var mapping = I4MIDefaultsService.get('I4MIMapping');
 	var schemes = I4MIDefaultsService.get('I4MISchemes');
-	console.log("0",mapping,schemes);
-	
+
 	var map = function(src, dst, data) {
 		if ( !Array.isArray(data) ) {
 			data = [data];
 		}
-		console.log("1",src,dst,data);
 		var output = [];
 		for ( var i in data ) {
 			var d = data[i];
@@ -661,7 +656,6 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 				var s = schemes[j];
 				for ( var k in mapping ) {
 					var m = mapping[k];
-					console.log("2",m,I4MIDefaultsService.getString(m[src].typeKey, d),I4MIDefaultsService.getString(m[src].typeKey, s[src]));
 					if ( I4MIDefaultsService.getString(m[src].typeKey,d) === I4MIDefaultsService.getString(m[src].typeKey,s[src]) ) {
 						type = j;
 						matchFound = true;
@@ -672,11 +666,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 					break;
 				}
 			}
-			console.log("3",type);
 			var out = JSON.parse(JSON.stringify(schemes[type][dst]));
-			out = I4MIDefaultsService.resolve(out);
-			console.log("4",out);
-			mapping[type] = I4MIDefaultsService.resolve(mapping[type]);
 			for ( var key in mapping[type][src] ) {
 				if ( key === "typeKey" ) {
 					continue;
@@ -687,7 +677,6 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 				for ( var i in values ) {
 					var v = values[i].split("|");
 					var path = v[0];
-					console.log(path);
 					if ( key === "date" ) {
 						var format = v[1];
 						var date = new Date(value);
@@ -703,7 +692,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 		}
 		return output;
 	}
-	
+
 	return {
 		map: map
 	}
