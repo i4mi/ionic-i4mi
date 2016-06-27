@@ -1,13 +1,14 @@
 <div ng-if="viewClass === 'modal'" class="{{viewClass}}">
-	<ion-header-bar>
-		<h1 class="title">MIDATA</h1>
+	<ion-header-bar class="bar-light item-icon-left">
+		<i class="icon ion-android-close" ng-click="closeModal()"></i>
+		<h1 class="title">MIDATA Login</h1>
 	</ion-header-bar>
-	<ion-content>
+	<ion-content padding="true" overflow-scroll="false" class="has-header">
 		<div ng-show="info.text" class="item item-{{info.type}} i4mi-info">
 			{{info.text}}
 		</div>
 		<formly-form model="user" fields="userFields">
-		  <button type="submit" class="button button-block button-positive" ng-click="login(user)">Login</button>
+		  <button type="submit" class="button button-full button-positive" ng-click="login(user)">Login</button>
 		</formly-form>
 	</ion-content>
 </div>
@@ -16,10 +17,10 @@
 		{{info.text}}
 	</div>
 	<formly-form model="user" fields="userFields">
-	  <button type="submit" class="button button-block button-positive" ng-click="login(user)">Login</button>
+	  <button type="submit" class="button button-full button-positive" ng-click="login(user)">Login</button>
 	</formly-form>
 </div>
 <div ng-show="loggedIn" ng-if="viewClass === 'widget'" class="{{viewClass}}">
 	<label class="item">{{currentUser}}</label>
-	<button type="submit" class="button button-block button-positive" ng-click="logout()">Logout</button>
+	<button type="submit" class="button button-full button-positive" ng-click="logout()">Logout</button>
 </div>
