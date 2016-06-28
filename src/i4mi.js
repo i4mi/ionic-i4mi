@@ -448,27 +448,101 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	};
 }])
 
-.directive('i4miHealthkitImport', ['I4MIHealthKitService',function(I4MIHealthKitService){
+.directive('i4miHealthkitBasic', ['I4MIHealthKitService','$ionicPlatform',function(I4MIHealthKitService,$ionicPlatform){
 	return {
 		restrict: 'E',
 		scope: {
-			types: '=',
-			choice: '@',
-			options: '=',
-			import: '='
+			autosave: '@',
+			update: '=?'
 		},
 		link: function(scope, element, attrs) {
-			scope.import = function() {
-				var tps = [];
-				for ( var t in types ) {
-					if ( types[t] ) {
-						tps.push(t);
+			$ionicPlatform.ready(function(){
+			scope.data = scope.data || {};
+			scope.saved = true;
+			
+			I4MIHealthKitService.readDateOfBirth().then(function(entry){
+				scope.data.dateofbirth = entry;
+				if ( typeof scope.update === 'function' && Object.keys(scope.data).length === 5 ) {
+					scope.update(scope.data);
+				}
+			},function(){});
+			I4MIHealthKitService.readGender().then(function(entry){
+				scope.data.gender = entry;
+				if ( typeof scope.update === 'function' && Object.keys(scope.data).length === 5 ) {
+					scope.update(scope.data);
+				}
+			},function(){});
+			I4MIHealthKitService.readBloodType().then(function(entry){
+				scope.data.bloodtype = entry;
+				if ( typeof scope.update === 'function' && Object.keys(scope.data).length === 5 ) {
+					scope.update(scope.data);
+				}
+			},function(){});
+			I4MIHealthKitService.readWeight({unit:'kg'}).then(function(entry){
+				entry.amount = entry.value;
+				entry.unit = "kg";
+				scope.data.weight = entry;
+				if ( typeof scope.update === 'function' && Object.keys(scope.data).length === 5 ) {
+					scope.update(scope.data);
+				}
+			},function(){
+				scope.data.weight = {unit:'kg'};
+			});
+			I4MIHealthKitService.readHeight({unit:'cm'}).then(function(entry){
+				entry.amount = entry.value;
+				entry.unit = "cm";
+				scope.data.height = entry;
+				if ( typeof scope.update === 'function' && Object.keys(scope.data).length === 5 ) {
+					scope.update(scope.data);
+				}
+			},function(){
+				scope.data.height = {unit:'cm'};
+			});
+			
+			scope.blur = function(data) {
+				if ( scope.autosave+'' === 'true' ) {
+					for ( var key in data ) {
+						var quantity = data[key];
+						if ( quantity.amount !== quantity.value ) {
+							quantity.amount = quantity.value;
+							quantity.date = new Date();
+							I4MIHealthKitService['save'+key.charAt(0).toUpperCase()+key.substr(1)](quantity).then(function(){},function(){});
+						}
+					}
+					if ( typeof scope.update === 'function' ) {
+						scope.update(scope.data);
 					}
 				}
-				I4MIHealthKitService.importRecords(tps, options);
 			}
+			
+			scope.change = function(data) {
+				var hasChanged = false;
+				for ( var key in data ) {
+					var quantity = data[key];
+					if ( quantity.amount !== quantity.value ) {
+						hasChanged = true;
+						break;
+					}
+				}
+				scope.saved = !hasChanged;
+			}
+			
+			scope.save = function(data) {
+				scope.saved = true;
+				for ( var key in data ) {
+					var quantity = data[key];
+					if ( quantity.amount !== quantity.value) {
+						quantity.amount = quantity.value;
+						I4MIHealthKitService['save'+key.charAt(0).toUpperCase()+key.substr(1)](quantity).then(function(){},function(){});
+					}
+				}
+				if ( typeof scope.update === 'function' ) {
+					scope.update(scope.data);
+				}
+			}
+			});
 		},
-		templateUrl: 'i4mi.healthkit.import.html'
+		templateUrl: 'i4mi.healthkit.basic.html'
 	};
 }])
 
@@ -663,49 +737,41 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 }])
 
 .service('I4MIHealthKitService',['I4MIModalService','$q', '$ionicPlatform',function(I4MIModalService, $q, $ionicPlatform){
-	var self = this;
-	var available = false;
-	$ionicPlatform.ready(function(){
-		var hk = {
-			available: function(){
-				return $q(function(resolve, reject){
-					resolve(false);
-				});
+	var callHK = function(method) {
+		return function(args) {
+			var deferred = $q.defer();
+			if ( window.plugins && plugins.healthkit ) {
+				if ( typeof args !== 'undefined' ) {
+					plugins.healthkit[method](args,deferred.resolve,deferred.reject);
+				} else {
+					plugins.healthkit[method](deferred.resolve,deferred.reject);
+				}
+			} else {
+				deferred.reject('healthkit not available');
 			}
+			return deferred.promise;
 		}
-		if ( window.plugins && plugins.healthkit ) {
-			hk = plugins.healthkit;
-			available = true;
-		}
-		for ( var m in hk ) {
-			self[m] = function(options) {
-				var deferred = $q.defer();
-				hk[m].call(self, options, deferred.resolve, deferred.reject);
-				return deferred.promise;
-			}
-		}
-		
-		window.healthkit = self;
-	});
-	
+	}
 	return {
-		exportToMIDATA: function(map) {
-			
-		},
-		syncToMIDATA: function(types, map) {
-			this.monitorSampleType();
-		},
-		doWhenAvailable: function(func) {
-			if ( available ) {
-				func();
-			}
-		},
-		import: function(types, options) {
-			options.startDate = options.startDate || new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-			options.endDate = options.endDate || new Date();
-			
-			//self.querySampleType({'sampleType': 'HKQuantityTypeIdentifierStepCount'
-		}
+		available: function(){ return typeof plugins.healthkit !== 'undefined' },
+		checkAuthStatus: callHK('checkAuthStatus'),
+		requestAuthorization: callHK('requestAuthorization'),
+		readDateOfBirth: callHK('readDateOfBirth'),
+		readGender: callHK('readGender'),
+		readBloodType: callHK('readBloodType'),
+		readWeight: callHK('readWeight'),
+		saveWeight: callHK('saveWeight'),
+		readHeight: callHK('readHeight'),
+		saveHeight: callHK('saveHeight'),
+		saveWorkout: callHK('saveWorkout'),
+		findWorkouts: callHK('findWorkouts'),
+		querySampleType: callHK('querySampleType'),
+		querySampleTypeAggregated: callHK('querySampleTypeAggregated'),
+		sumQuantityType: callHK('sumQuantityType'),
+		monitorSampleType: callHK('monitorSampleType'),
+		saveQuantitySample: callHK('saveQuantitySample'),
+		saveCorrelation: callHK('saveCorrelation'),
+		queryCorrelationType: callHK('queryCorrelationType')
 	}
 }])
 
