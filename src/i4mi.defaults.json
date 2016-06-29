@@ -74,7 +74,7 @@
 				"typeKey": "code.coding"
 			},
 			"healthkit": {
-				"value": ["amount"],
+				"value": ["amount","value"],
 				"date": ["startDate|{$ref:I4MIFormats.date.object}","endDate|{$ref:I4MIFormats.date.object}"],
 				"typeKey": "sampleType"
 			}

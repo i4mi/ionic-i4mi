@@ -453,7 +453,8 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 		restrict: 'E',
 		scope: {
 			autosave: '@',
-			update: '=?'
+			update: '=?',
+			title: '@'
 		},
 		link: function(scope, element, attrs) {
 			$ionicPlatform.ready(function(){
@@ -531,8 +532,9 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 				scope.saved = true;
 				for ( var key in data ) {
 					var quantity = data[key];
-					if ( quantity.amount !== quantity.value) {
+					if ( quantity.amount !== quantity.value ) {
 						quantity.amount = quantity.value;
+						quantity.date = new Date();
 						I4MIHealthKitService['save'+key.charAt(0).toUpperCase()+key.substr(1)](quantity).then(function(){},function(){});
 					}
 				}
@@ -666,7 +668,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	}
 }])
 
-.service('I4MISettingsService', ['$localStorage','$crypto',function($localStorage,$crypto){
+.service('I4MISettingsService', ['$localStorage','$crypto','$ionicPlatform',function($localStorage,$crypto,$ionicPlatform){
 	var encryptionKey;
 	if ( window.device && device.uuid ) {
 		encryptionKey = device.uuid;
@@ -736,7 +738,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	}
 }])
 
-.service('I4MIHealthKitService',['I4MIModalService','$q', '$ionicPlatform',function(I4MIModalService, $q, $ionicPlatform){
+.service('I4MIHealthKitService',['I4MIModalService','$q',function(I4MIModalService, $q){
 	var callHK = function(method) {
 		return function(args) {
 			var deferred = $q.defer();
@@ -765,7 +767,18 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 		saveHeight: callHK('saveHeight'),
 		saveWorkout: callHK('saveWorkout'),
 		findWorkouts: callHK('findWorkouts'),
-		querySampleType: callHK('querySampleType'),
+		querySampleType: function(opts){
+			return $q(function(resolve,reject){
+				plugins.healthkit.querySampleType(opts,function(data){
+					for (var i in data) {
+						var d = data[i];
+						d.sampleType = opts.sampleType;
+						d.amount = d.quantity || d.value;
+					}
+					resolve(data);
+				},reject);
+			});
+		},
 		querySampleTypeAggregated: callHK('querySampleTypeAggregated'),
 		sumQuantityType: callHK('sumQuantityType'),
 		monitorSampleType: callHK('monitorSampleType'),
@@ -855,7 +868,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	var mapping = I4MIDefaultsService.get('I4MIMapping');
 	var schemes = I4MIDefaultsService.get('I4MISchemes');
 
-	var map = function(src, dst, data) {
+	var map = function(src, dst, data, ty) {
 		if ( !Array.isArray(data) ) {
 			data = [data];
 		}
@@ -863,19 +876,21 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 		for ( var i in data ) {
 			var d = data[i];
 			var matchFound = false;
-			var type;
-			for ( var j in schemes ) {
-				var s = schemes[j];
-				for ( var k in mapping ) {
-					var m = mapping[k];
-					if ( I4MIDefaultsService.getString(m[src].typeKey,d) === I4MIDefaultsService.getString(m[src].typeKey,s[src]) ) {
-						type = j;
-						matchFound = true;
+			var type = ty;
+			if ( typeof type === 'undefined' ) {
+				for ( var j in schemes ) {
+					var s = schemes[j];
+					for ( var k in mapping ) {
+						var m = mapping[k];
+						if ( I4MIDefaultsService.getString(m[src].typeKey,d) === I4MIDefaultsService.getString(m[src].typeKey,s[src]) ) {
+							type = j;
+							matchFound = true;
+							break;
+						}
+					}
+					if ( matchFound ) {
 						break;
 					}
-				}
-				if ( matchFound ) {
-					break;
 				}
 			}
 			var out = JSON.parse(JSON.stringify(schemes[type][dst]));
