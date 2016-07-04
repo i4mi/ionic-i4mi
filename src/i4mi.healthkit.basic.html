@@ -1,0 +1,24 @@
+<div class="list">
+  <div ng-show="title" class="item item-divider">{{title}}</div>
+  <label class="item item-input">
+    <span class="input-label">Date of Birth:</span>
+	<input type="text" value="{{ data.dateofbirth | date:'dd MMMM yyyy' }}" disabled>
+  </label>
+  <label class="item item-input">
+    <span class="input-label">Gender:</span>
+    <input type="text" value="{{ data.gender }}" disabled>
+  </label>
+  <label class="item item-input">
+    <span class="input-label">Blood Type:</span>
+    <input type="text" value="{{ data.bloodtype }}" disabled>
+  </label>
+  <label class="item item-input">
+    <span class="input-label">Weight [{{ data.weight.unit }}]:</span>
+    <input type="number" ng-change="change(data)" ng-blur="blur(data)" ng-model="data.weight.value" value="{{ data.weight.value }}">
+  </label>
+  <label class="item item-input">
+    <span class="input-label">Height [{{ data.height.unit }}]:</span>
+    <input type="number" ng-change="change(data)" ng-blur="blur(data)" ng-model="data.height.value" value="{{ data.height.value }}">
+  </label>
+  <button ng-show="autosave!=='true'" ng-disabled="saved" ng-click="save(data)" class="button button-positive button-full">Save</button>
+</div>

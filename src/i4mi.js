@@ -581,6 +581,20 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 /******************************************************/
 /* services */
 /******************************************************/
+.service('I4MIService',['$ionicPlatform','I4MIModalService','I4MISettingsService','I4MICcdaService','I4MIHealthKitService','I4MIDefaultsService','I4MIMappingService','I4MIMidataService',function($ionicPlatform,I4MIModalService,I4MISettingsService,I4MICcdaService,I4MIHealthKitService,I4MIDefaultsService,I4MIMappingService,I4MIMidataService){
+	var services = {
+		modal: I4MIModalService,
+		settings: I4MISettingsService,
+		ccda: I4MICcdaService,
+		healthkit: I4MIHealthKitService,
+		default: I4MIDefaultsService,
+		mapping: I4MIMappingService,
+		midata: I4MIMidataService
+	}
+
+	return services;
+}])
+
 .service('I4MIModalService', ['$ionicModal','$rootScope','$q','$injector','$controller',function($ionicModal, $rootScope, $q, $injector, $controller) {
 
 	return {
@@ -712,29 +726,6 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 	
 	return {
 		importRecord: importRecord
-	}
-}])
-
-.service('I4MINativeService',['$q',function($q){
-	var self = this;
-	
-	var call = function(action, args){
-		var deferred = $q.defer();
-		cordova.exec(deferred.resolve, deferred.reject, "I4MI", action, args);
-		return deferred.promise;
-	};
-	
-	cordova.exec(function(result){
-		var fields = result.fields;
-		for (var j = 0; j < fields.length; j++ ) {
-			self[fields[j]] = function(){
-				return call(fields[j], arguments);
-			};
-		}
-	}, function(){}, "I4MI", "i4miNativeMethods", args);
-	
-	return {
-		exec: call
 	}
 }])
 
