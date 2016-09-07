@@ -42,3 +42,7 @@ The complete documentation can be found at: https://github.com/i4mi/ionic-i4mi/t
 
 
 # License
+
+
+# Examples
+
