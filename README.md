@@ -42,7 +42,12 @@ The complete documentation can be found at: https://github.com/i4mi/ionic-i4mi/t
 
 
 # License
+Released under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.  
 
 
 # Examples
+<a href="">Hello I4MI</a>
+<a href="">mHealth</a>
+<a href="">I4MIDemoApp</a>
+
 

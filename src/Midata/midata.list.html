@@ -1,0 +1,74 @@
+<ion-list can-swipe="canSwipe !== 'false'">
+	<ion-item ng-if="record.data.status !== 'entered-in-error'" ng-repeat="record in records">
+		<div ng-if="!templateUrl || templateUrl === ''">
+
+			<div ng-if="!record.data.valueQuantity">
+				<h3>
+					<span class="i4mi-name">
+						{{ record.name }}
+					</span>
+				</h3>
+				<h2>
+					<div ng-repeat="(key,value) in record.data track by $index">
+						<div ng-show="shouldShow(key)">
+							<span ng-show="showKey !== 'false'" class="i4mi-key">{{ key }}:</span>
+							<span class="i4mi-value">{{ value }}</span>
+						</div>
+					</div>
+				</h2>
+				<h4>
+					<span class="i4mi-description">
+						{{ record.description }}
+					</span>
+				</h4>
+				<h4>
+					<span class="i4mi-datetime">
+						{{ record.data.effectiveDateTime | date:'dd. MMMM yyyy' }}
+					</span>
+				</h4>
+			</div>
+
+			<div ng-if="record.data.valueQuantity">
+				<h3>
+					<span class="i4mi-name">
+						{{ record.name }}
+					</span>
+				</h3>
+				<h2>
+					<span class="i4mi-value">
+						{{ record.data.valueQuantity.value }}
+					</span>
+					<span class="i4mi-unit">
+						{{ record.data.valueQuantity.unit }}
+					</span>
+				</h2>
+				<h4>
+					<span class="i4mi-description">
+						{{ record.description }}
+					</span>
+				</h4>
+				<h4 ng-repeat="system in record.data.code.coding">
+					<span class="i4mi-system">
+						{{ system.system }}
+					</span>
+					<span class="i4mi-code">
+						{{ system.code }}
+					</span>
+					<span class="i4mi-display">
+						{{ system.display }}
+					</span>
+				</h4>
+				<h4>
+					<span class="i4mi-datetime">
+						{{ record.data.effectiveDateTime | date:'dd. MMMM yyyy' }}
+					</span>
+				</h4>
+			</div>
+
+		</div>
+		<div ng-if="templateUrl !== ''">
+			<div class="dynamic-field" ng-include="templateUrl"></div>
+		</div>
+		<ion-option-button class="button-assertive" ng-click="remove(record)">Remove</ion-option-button>
+	</ion-item>
+</ion-list>

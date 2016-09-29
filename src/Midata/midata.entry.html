@@ -1,0 +1,44 @@
+<div ng-if="viewClass === 'modal'" class="{{viewClass}}">
+	<ion-header-bar class="bar-light item-icon-left">
+		<i class="icon ion-android-close" ng-click="closeModal()"></i>
+		<h1 class="title">MIDATA New Entry</h1>
+	</ion-header-bar>
+	<ion-content overflow-scroll="true" class="has-header">
+		<div ng-show="info.text" class="item item-{{info.type}} i4mi-info">
+			{{info.text}}
+		</div>
+		<formly-form model="model" fields="schema">
+			<div ng-if="native+'' === 'true'" class="item item-input">
+				<input type="datetime" ng-model="datetime">
+			</div>
+			<div ng-if="native+'' !== 'true'" class="button-bar i4mi-datetime">
+				<button class="button button-light" ng-click="openDatePicker()">
+					{{ datetime | date:'dd. MMMM yyyy' }}
+				</button>
+				<button ionic-timepicker input-obj="tpo" class="button button-light">
+				  	{{ datetime | date:'HH:mm' }}
+				</button>
+			</div>
+			<button type="submit" class="button button-full button-positive" ng-click="add(model)">Add Entry</button>
+		</formly-form>
+	</ion-content>
+</div>
+<div ng-if="viewClass === 'widget'" class="{{viewClass}}">
+	<div ng-show="info.text" class="item item-{{info.type}} i4mi-info">
+		{{info.text}}
+	</div>
+	<formly-form model="model" fields="schema">
+		<div ng-if="native+'' === 'true'" class="item item-input">
+			<input type="datetime" ng-model="datetime">
+		</div>
+		<div ng-if="native+'' !== 'true'" class="button-bar item item-input i4mi-datetime">
+			<button class="button button-light" ng-click="openDatePicker()">
+				{{ datetime | date:'dd. MMMM yyyy' }}
+			</button>
+			<button ionic-timepicker input-obj="tpo" class="button button-light">
+			  	{{ datetime | date:'HH:mm' }}
+			</button>
+		</div>
+		<button type="submit" class="button button-block button-positive" ng-click="add(model)">Add Entry</button>
+	</formly-form>
+</div>
