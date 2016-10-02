@@ -1,8 +1,8 @@
-# Implement Module MIDATA
+# MIDATA
 This module has the most important functions to work with MIDATA.
 
 
-## Installation
+## Implement MIDATA
 
 1. Add the script reference to your *index.html*
 
@@ -53,7 +53,7 @@ This module has the most important functions to work with MIDATA.
 
 ```
 
-2. In the controller file we implement the fields that we need (Note: This is a example with *weight* and *steps*)
+2. In the controller file we implement the fields that we need (Note: This is an example with *weight* and *steps*)
 
 ```sh
 .controller('ExampleCtrl', function($scope, I4MIMidataService) {
@@ -200,7 +200,7 @@ This module has the most important functions to work with MIDATA.
 
 ```
 
-#### List (Note: This is a example)
+#### List (Note: This is an example)
 1. To see your data in a list view
 ```sh
 
