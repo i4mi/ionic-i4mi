@@ -30,15 +30,20 @@ var ChartJS = function(config)
 
 ChartJS.prototype.line = function() {
 console.info("Create a ChartJS-Line-Object");
+
 var data = {
   labels: config['labels'],
   series: [config['series']]
 };
+
 new Chartist.Line(config['name'], data);
+
+
 };
 
 ChartJS.prototype.bar = function($config) {
 console.info("Create a ChartJS-Bar-Object");
+
 new Chartist.Bar(config['name'], {
   labels: config['labels'],
   series: [config['series']
@@ -52,6 +57,8 @@ new Chartist.Bar(config['name'], {
   }
 });
 };
+
+
 
 ChartJS.prototype.pie = function($config) {
 console.info("Create a ChartJS-pie-Object");
