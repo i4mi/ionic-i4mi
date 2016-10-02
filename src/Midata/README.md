@@ -186,3 +186,33 @@ This module has the most important functions to work with MIDATA.
     }
 })
 ```
+### Read
+1. To search/get for data add following lines in your controller
+```sh
+
+.controller('ExampleCtrl', function($scope, I4MIMidataService) {
+  I4MIMidataService.search().then(function(response){
+		$scope.records = response.data;
+	},function(reason) {
+	});
+  ...
+})
+
+```
+
+#### List (Note: This is a example)
+1. To see your data in a list view
+```sh
+
+<i4mi-list records="records" show-key can-remove keys="status,valueQuantity,code"></i4mi-list>
+
+```
+
+#### Chart (Note: This is a example)
+1. To see your data in a chart view
+
+```sh
+
+<i4mi-chart controller-name="I4MIMidataChartController" records="records" interval="day" operation="avg" type="lineChart"></i4mi-chart>
+
+```

@@ -21,7 +21,7 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 					$scope.loggedIn = true;
 					$scope.currentUser = user.username;
 				},700);
-				
+
 			} else {
 				$scope.loggedIn = I4MIMidataService.loggedIn();
 				$scope.info = {
@@ -143,6 +143,8 @@ angular.module('i4mi', ['i4mi.templates','i4mi.defaults','ionic','ionic-datepick
 				midataEntry.push(tmpEntry);
 			}
 		}
+
+
 		I4MIMidataService.add(midataEntry).then(function(result) {
 			if ( result.success ) {
 				$scope.info = {
