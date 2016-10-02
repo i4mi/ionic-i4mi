@@ -32,7 +32,7 @@ Now you can find the framework in www/lib
 
 
 # Usage
-1. Add the *i4mi-Bundle* in your *index.html*
+Add the *i4mi-Bundle* in your *index.html*
 
 ```sh
 
@@ -49,5 +49,5 @@ Released under the <a href="https://opensource.org/licenses/MIT">MIT License</a>
 
 
 # Examples
-<a href="https://github.com/i4mi/hello-i4mi">Hello I4MI</a>
+<a href="https://github.com/i4mi/hello-i4mi">Hello I4MI</a> |
 <a href="https://github.com/i4mi/mhealth">mHealth</a>
