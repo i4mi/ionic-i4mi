@@ -2,20 +2,22 @@
 This module has the most important functions to work with MIDATA.
 
 
+## Installation
+
 1. Add the script reference to your *index.html*
 
 ```sh
 
-<script src="lib/ionic-i4mi/dist/i4mitest.bundle.min.js"></script>
+<script src="lib/ionic-i4mi/src/Midata/dist/i4mi.bundle.min.js"></script>
 
 ```
 
-# Usage
+## Usage
 
-*Connect*
+### Connect
 
 
-1. The login form with the logic behind can easily be integrated with the following line.
+1. The login form with the logic behind can easily  integrated with the following line in your template file (e.g login.html).
 
 ```sh
 
@@ -23,23 +25,164 @@ This module has the most important functions to work with MIDATA.
 
 ```
 
-
-2. Now we need some information in our controller
-
+2. Now we need in our controller some additional information.
 
 ```sh
 
 .controller('ExampleCtrl', function($scope, I4MIMidataService) {
 
-  // Use for testing the development enviroment
+  // Use for testing the development environment
   $scope.user = {
     server: 'https://test.midata.coop:9000'
   }
 
-  // Connect with me Data
+  // Connect with MIDATA
   $scope.loggedIn = I4MIMidataService.loggedIn();
-
-
 })
 
+```
+
+### Create
+
+1. Let's integrated the form to create some entries
+
+
+```sh
+
+<i4mi-midata-entry clear="true" controller-name="I4MIMidataEntryController" model="entry" fields="entryFields" fhir="fhirGroup" group-entry="true"></i4mi-midata-entry>
+
+```
+
+2. In the controller file we implement the fields that we need (Note: This is a example with *weight* and *steps*)
+
+```sh
+.controller('ExampleCtrl', function($scope, I4MIMidataService) {
+  $scope.entry = {};
+
+    $scope.entryFields = [
+      {
+        key: 'weight',
+        type: 'input',
+        templateOptions: {
+          type: 'number',
+          label: 'Weight [kg]',
+          placeholder: 200
+        }
+      },
+      {
+        key: 'steps',
+        type: 'input',
+        templateOptions: {
+          type: 'number',
+          label: 'Steps',
+          placeholder: 10000
+        }
+      }
+    ]
+
+    $scope.fhirGroup = {
+      name: "Gruppe",
+      format: "fhir/Observation",
+      subformat: "String",
+      content: "http://loinc.org 61150-9",
+      data: {
+        "resourceType": "Observation",
+        "status": "preliminary",
+        "category": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/ValueSet/observation-category",
+                "code": "survey",
+                "display": "Survey"
+                }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+                "code": "61150-9",
+                "display": "Subjective Narrative"
+                }
+          ]
+        },
+        $set: "valueString"
+      }
+    }
+
+    $scope.fhir = {
+      weight: {
+        name: "Gewicht",
+        format: "fhir/Observation",
+        subformat: "Quantity",
+        content: "http://loinc.org 3141-9",
+        data: {
+          "resourceType": "Observation",
+          "status": "preliminary",
+          "category": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/ValueSet/observation-category",
+                  "code": "vital-signs",
+                  "display": "Vital Signs"
+                  }
+            ]
+          },
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                  "code": "3141-9",
+                  "display": "Body weight Measured"
+                  }
+            ]
+          },
+          "valueQuantity":  {
+            "unit": "kg",
+            "system": "http://unitsofmeasure.org",
+            "code": "kg"
+          },
+          $set: "valueQuantity.value"
+        }
+      },
+      steps: {
+        name: "Schritte",
+        format: "fhir/Observation",
+        subformat: "Quantity",
+        content: "http://loing.org 55423-8",
+        data: {
+          "resourceType": "Observation",
+          "status": "preliminary",
+          "category": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/ValueSet/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          },
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                  "code": "55423-8",
+                  "display": "Number of steps in unspecified time Pedometer"
+                  }
+            ]
+          },
+          "valueQuantity":  {
+            "unit": "steps",
+            "system": "http://midata.coop",
+            "code": "steps"
+          },
+          $set: "valueQuantity.value"
+        }
+      }
+    }
+
+    $scope.showEntryModal = function() {
+      I4MIMidataService.newEntry($scope.entry, $scope.entryFields, $scope.fhir, {/* options */});
+    }
+})
 ```
