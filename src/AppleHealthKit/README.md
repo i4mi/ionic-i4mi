@@ -1,33 +1,47 @@
-/*
+# Implement Module Apple HealthKit
+This module has the most important functions to work with MIDATA.
 
-This is a tutorial how to implement Apple HealthKit into your app
+## Enable HealthKit
 
-*/
+1. Add the script reference to your *index.html*
 
 
-
-// Add following line in your index.html file
+```sh
 
 <script src='lib/ngCordova/dist/ng-cordova.js'></script>
 
-
-// Open the terminal, navigate to your project folder and run the following command
-
-cordova plugin add https://github.com/Telerik-Verified-Plugins/HealthKit
+```
 
 
-// Open the terminal and run following commands
-ionic add platform ios
-ionic build ios
+2. Open the terminal, navigate to your project folder and run the following command
 
-// Open in platform the IOS project with Xcode and do following steps
-1. go on the tab "capabilities"
-2. switch the HealthKit to on
+```sh
+
+$ cordova plugin add https://github.com/Telerik-Verified-Plugins/HealthKit
+
+```
 
 
 
-// Here is a little Example with height
-// Add following lines in your template file
+3. Open the terminal and build a xCode-Project
+
+```sh
+
+$ ionic add platform ios
+$ ionic build ios
+
+```
+
+
+3. Navigate in your project folder to platform/ios and open with xCode the project
+  a. go on the tab "capabilities"
+  b. switch the HealthKit to on
+
+## Example
+
+1. Add the heigth to your template file (e.g  tabs-example.html)
+
+```sh
 <!-- Height -->
       <div class="list">
         <div class="item item-input-inset">
@@ -44,9 +58,11 @@ ionic build ios
       <button class="button button-positive" ng-click="saveWorkout()">Set a Workout</button>
       <button class="button button-positive" ng-click="getWorkouts()">Get workout data</button>
 <!-- / Height -->
+```
 
+2. Go into your *app.js* and in *ionicplatform.ready()* following lines
 
-// go in app.js add in ionicplaform.ready() following lines
+```sh
 cordovaHealthKit.isAvailable().then(function(yes) {
     // HK is available
     var permissions = ['HKQuantityTypeIdentifierHeight'];
@@ -63,10 +79,12 @@ cordovaHealthKit.isAvailable().then(function(yes) {
 }, function(no) {
     // No HK available
 });
+```
 
+3. Add the following logic to your controller
 
-// Now you can add the following line to your controller
-.controller('AppCtrl', function($scope, $cordovaHealthKit) {
+```sh
+.controller('ExampleCtrl', function($scope, $cordovaHealthKit) {
   var healthKit = new HealthKit($scope, $cordovaHealthKit);
   // Save height
   healthKit.saveHeight();
@@ -79,5 +97,6 @@ cordovaHealthKit.isAvailable().then(function(yes) {
 
   // Get Workouts
   healthKit.getWorkouts();
-
+  ...
 }
+```
