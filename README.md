@@ -36,9 +36,32 @@ Add the *i4mi-Bundle* in your *index.html*
 
 ```sh
 
+<!-- ADD DEPENDENCIES LINKS -->
 <script src="lib/ionic-i4mi/src/Midata/dist/i4mi.bundle.min.js"></script>
+<script src="lib/ionic-datepicker/dist/ionic-datepicker.bundle.min.js"></script>
+<script src="lib/ionic-timepicker/dist/ionic-timepicker.bundle.min.js"></script>
+<script src="lib/d3/d3.js"></script>
+<script src="lib/nvd3/build/nv.d3.js"></script>
+<script src="lib/angular-nvd3/dist/angular-nvd3.js"></script>
+<script src="lib/ngstorage/ngStorage.min.js"></script>
+<script src="lib/api-check/dist/api-check.min.js"></script>
+<script src="lib/angular-formly/dist/formly.min.js"></script>
+<script src="lib/angular-formly-templates-ionic/dist/angular-formly-templates-ionic.js"></script>
+<script src="lib/cryptojslib/rollups/aes.js"></script>
+<script src="lib/angular-cryptography/mdo-angular-cryptography.js"></script>
+<script src="lib/json-formatter/dist/json-formatter.js"></script>
 
 ```
+
+
+Add new modules in your *app.js* and a new AppSecret to communicate with 
+
+```sh
+
+angular.module('starter', ['ionic', 'ionic-datepicker', 'ionic-timepicker', 'formlyIonic', 'nvd3', 'i4mi', 'starter.controllers', 'starter.services','jsonFormatter'])
+
+```
+
 
 # Documentation
 An Ionic documentation is <a href="https://drive.switch.ch/index.php/s/IoNNypBX4jnZTru">here</a> available.
