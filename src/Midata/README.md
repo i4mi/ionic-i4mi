@@ -45,9 +45,13 @@ This module has the most important functions to work with MIDATA.
 
 3. Add an *APPNAME* and an *APPSECRET*
 
+```sh
+
 angular.module('starter', ['ionic', 'ionic-datepicker', 'ionic-timepicker', 'formlyIonic', 'nvd3', 'i4mi', 'starter.controllers', 'starter.services','jsonFormatter'])
 .constant('APPNAME', 'HelloI4MI')
 .constant('APPSECRET', '8385bee7542099b10315dcb7b803b61a')
+
+```
 
 
 ### Create
