@@ -43,7 +43,7 @@ This module has the most important functions to work with MIDATA.
 ```
 
 
-3. Add an *APPNAME* and an *APPSECRET*
+3. Add an *APPNAME* and an *APPSECRET* in your *app.js*
 
 ```sh
 

@@ -54,7 +54,7 @@ Add the *i4mi-Bundle* in your *index.html*
 ```
 
 
-Add new modules in your *app.js* and a new AppSecret to communicate with 
+Add new modules in your *app.js* and a new AppSecret to communicate with
 
 ```sh
 
@@ -64,13 +64,8 @@ angular.module('starter', ['ionic', 'ionic-datepicker', 'ionic-timepicker', 'for
 
 
 # Documentation
-An Ionic documentation is <a href="https://drive.switch.ch/index.php/s/IoNNypBX4jnZTru">here</a> available.
+A documentation about ionic is <a href="https://drive.switch.ch/index.php/s/IoNNypBX4jnZTru">here</a> available.
 
 
 # License
 Released under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.  
-
-
-# Examples
-<a href="https://github.com/i4mi/hello-i4mi">Hello I4MI</a> |
-<a href="https://github.com/i4mi/mhealth">mHealth</a>
