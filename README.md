@@ -61,6 +61,10 @@ Add new modules in your *app.js* and a new AppSecret to communicate with
 angular.module('starter', ['ionic', 'ionic-datepicker', 'ionic-timepicker', 'formlyIonic', 'nvd3', 'i4mi', 'starter.controllers', 'starter.services','jsonFormatter'])
 
 ```
+# Example App
+<a href="https://github.com/i4mi/MIDATADemoApp">MIDATADemoApp</a>
+
+
 
 
 # Documentation
