@@ -57,27 +57,37 @@ const cloudSettings: CloudSettings = {
   }
 };
 
+
 ```
 
-#### 
+#### local-notification
 
 1. Add the cordova-local-notification-plugin in your project with following command
 
+```sh
+
     $ sudo cordova plugin add de.appplant.cordova.plugin.local-notification
 
+```
 
 2. Add following line in index.html file to implement script in your app
 
+```sh
+
 <script src="lib/ngCordova/dist/ng-cordova.min.js"></script>
 
+```
 
 3. Add module ngCordova to your app.js
 
+```sh
+
 angular.module("ionic", ["ionic", "ngCordova"]);
 
-
+```
 
 4. Add in your Controller this basic function construct
+```sh
 
 // Check if is mobile
 if (window.cordova) {
@@ -98,3 +108,5 @@ if (window.cordova) {
   // Create a console log if is not on a mobile device
   console.log('window.cordova NOT available');
 }
+
+```
